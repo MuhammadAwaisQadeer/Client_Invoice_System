@@ -1,0 +1,85 @@
+﻿@page "/resources"
+@rendermode InteractiveServer
+@using Client_Invoice_System.Models
+@using Client_Invoice_System.Repository
+@inject NavigationManager Navigation
+@inject ResourceRepository ResourceRepository
+@inject EmployeeRepository EmployeeRepository
+@inject ClientRepository ClientRepository
+
+<h3>Manage Contracts (@(ResourcesList?.Count ?? 0))</h3>
+<div class="d-flex justify-content-end">
+    <button class="btn btn-primary mb-3" @onclick="NavigateToAddResource">Add Contract</button>
+</div>
+
+@if (ResourcesList != null && ResourcesList.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Resource Name</th>
+                <th>Employee</th>
+                <th>Consumed Hours</th>
+                <th>Contract Status</th> @* New Column *@
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var resource in ResourcesList)
+            {
+                var contractStatus = GetContractStatus(resource.DueDate);
+                var statusClass = contractStatus == "Active" ? "text-success fw-bold" : "text-danger fw-bold";
+
+                <tr>
+                    <td>@(resource.Client?.Name ?? "Unknown")</td>
+                    <td>@resource.ResourceName</td>
+                    <td>@(resource.Employee?.EmployeeName ?? "Unknown")</td>
+                    <td>@resource.ConsumedTotalHours</td>
+                    <td class="@statusClass">@contractStatus</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => NavigateToEditResource(resource.ResourceId)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteResource(resource.ResourceId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private List<Resource> ResourcesList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+        // Removed the loop that was resetting resource.Client
+    }
+
+    private string GetContractStatus(DateTime? dueDate)
+    {
+        if (!dueDate.HasValue || dueDate.Value == DateTime.MinValue)
+            return "Unknown";
+        return dueDate.Value >= DateTime.Today ? "Active" : "Ended";
+    }
+
+    private void NavigateToAddResource()
+    {
+        Navigation.NavigateTo("/add-edit-resource");
+    }
+
+    private void NavigateToEditResource(int resourceId)
+    {
+        Navigation.NavigateTo($"/add-edit-resource/{resourceId}");
+    }
+
+    private async Task DeleteResource(int resourceId)
+    {
+        await ResourceRepository.DeleteAsync(resourceId);
+        ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+    }
+}
