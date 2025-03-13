@@ -18,7 +18,7 @@ namespace Client_Invoice_System.Models
         public decimal TotalAmount { get; set; }  // Calculated based on resources used
 
         public string Currency { get; set; }   // To handle multi-currency support
-
+        public string EmailStatus { get; set; } = "Not Sent";
         public bool IsPaid { get; set; } = false; // Payment status
     }
 }

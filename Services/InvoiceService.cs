@@ -80,7 +80,8 @@ namespace Client_Invoice_System.Services
                     InvoiceDate = DateTime.UtcNow,
                     TotalAmount = totalAmount,
                     Currency = client.Currency ?? "USD",
-                    IsPaid = false
+                    IsPaid = false,
+                    EmailStatus = "Not Sent"
                 };
 
                 await _context.Invoices.AddAsync(invoice);
@@ -98,7 +99,7 @@ namespace Client_Invoice_System.Services
         }
 
 
-        public async Task SendInvoiceToClientAsync(int clientId)
+        public async Task<bool> SendInvoiceToClientAsync(int clientId)
         {
             try
             {
@@ -106,16 +107,30 @@ namespace Client_Invoice_System.Services
                 if (client == null)
                     throw new Exception("Client not found.");
 
+                var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.ClientId == clientId);
+                if (invoice == null)
+                    throw new Exception("Invoice not found.");
+
                 byte[] invoicePdf = await GenerateInvoicePdfAsync(clientId);
                 string fileName = $"Invoice_{clientId}.pdf";
 
                 await _emailService.SendInvoiceEmailAsync(client.Email, invoicePdf, fileName);
+
+                // ✅ Update EmailStatus after sending
+                invoice.EmailStatus = "Sent";
+                _context.Invoices.Update(invoice);
+                await _context.SaveChangesAsync();
+
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Error sending invoice: {ex.Message}");
+                return false;
             }
         }
+
+
 
         public async Task<byte[]> GenerateInvoicePdfAsync(int clientId)
         {

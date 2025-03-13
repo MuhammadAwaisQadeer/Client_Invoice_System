@@ -34,6 +34,7 @@
             <th>Total Amount</th>
             <th>Currency</th>
             <th>Status</th>
+            <th>EmailStatus</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -50,6 +51,11 @@
                     <td>
                         <span class="badge @(invoice.IsPaid ? "bg-success" : "bg-danger")">
                             @(invoice.IsPaid ? "Paid" : "Unpaid")
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge @(invoice.EmailStatus == "Sent" ? "bg-primary" : "bg-warning")">
+                            @invoice.EmailStatus
                         </span>
                     </td>
                     <td>
@@ -119,14 +125,18 @@
                 return;
             }
 
-            await InvoiceService.SendInvoiceToClientAsync(clientId);
-            Console.WriteLine($"Invoice sent successfully to Client {clientId}.");
+            bool emailSent = await InvoiceService.SendInvoiceToClientAsync(clientId);
+            Console.WriteLine(emailSent ? "Invoice email sent." : "Failed to send invoice email.");
+
+            // Refresh invoices to update UI
+            Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error sending invoice: {ex.Message}");
         }
     }
+
     private async Task GenerateInvoice()
     {
         try
