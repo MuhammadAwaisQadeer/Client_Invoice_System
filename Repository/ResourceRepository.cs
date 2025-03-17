@@ -148,8 +148,7 @@ namespace Client_Invoice_System.Repository
                     existingResource.ResourceName = resource.ResourceName;
                     existingResource.EmployeeId = resource.EmployeeId;
                     existingResource.ConsumedTotalHours = resource.ConsumedTotalHours;
-                    existingResource.DueDate = resource.DueDate == DateTime.MinValue ? DateTime.Today : resource.DueDate;
-
+                    existingResource.IsActive = resource.IsActive;
                     await _context.SaveChangesAsync();
                     Console.WriteLine($"✅ Resource {resource.ResourceId} updated successfully.");
                 }

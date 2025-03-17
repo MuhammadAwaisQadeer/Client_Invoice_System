@@ -1,73 +1,77 @@
-﻿$(document).ready(function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     const rowsPerPage = 3; // Set rows per page
     let currentPage = 1;
 
-    function updateTableRows() {
-        return $("#clientTable tbody tr").filter(":visible").toArray();
+    function updateTableRows(tableId) {
+        return document.querySelectorAll(`#${tableId} tbody tr`);
     }
 
-    function displayPage(page) {
-        let tableRows = updateTableRows();
+    function displayPage(tableId, page) {
+        let tableRows = updateTableRows(tableId);
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         tableRows.forEach((row, index) => {
-            $(row).toggle(index >= start && index < end);
+            row.style.display = index >= start && index < end ? "" : "none";
         });
     }
 
-    function setupPagination() {
-        let tableRows = updateTableRows();
+    function setupPagination(tableId) {
+        let tableRows = updateTableRows(tableId);
         const pageCount = Math.ceil(tableRows.length / rowsPerPage);
-        const pagination = $("#pagination");
-        pagination.empty();
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
 
         if (pageCount <= 1) return;
 
         function createPageItem(text, page, disabled, active) {
-            return `<li class="page-item ${disabled ? "disabled" : ""} ${active ? "active" : ""}">
-                        <a class="page-link" href="#">${text}</a>
-                    </li>`;
+            let li = document.createElement("li");
+            li.className = `page-item ${disabled ? "disabled" : ""} ${active ? "active" : ""}`;
+            let a = document.createElement("a");
+            a.className = "page-link";
+            a.href = "#";
+            a.textContent = text;
+            a.addEventListener("click", function (e) {
+                e.preventDefault();
+                if (text === "❮" && currentPage > 1) currentPage--;
+                else if (text === "❯" && currentPage < pageCount) currentPage++;
+                else if (!isNaN(text)) currentPage = parseInt(text);
+                displayPage(tableId, currentPage);
+                setupPagination(tableId);
+            });
+            li.appendChild(a);
+            return li;
         }
 
-        pagination.append(createPageItem("❮", currentPage - 1, currentPage === 1));
+        pagination.appendChild(createPageItem("❮", currentPage - 1, currentPage === 1));
         for (let i = 1; i <= pageCount; i++) {
-            pagination.append(createPageItem(i, i, false, i === currentPage));
+            pagination.appendChild(createPageItem(i, i, false, i === currentPage));
         }
-        pagination.append(createPageItem("❯", currentPage + 1, currentPage === pageCount));
-
-        $(".page-item a").on("click", function (e) {
-            e.preventDefault();
-            const pageNum = $(this).text();
-            if (pageNum === "❮" && currentPage > 1) currentPage--;
-            else if (pageNum === "❯" && currentPage < pageCount) currentPage++;
-            else if (!isNaN(pageNum)) currentPage = parseInt(pageNum);
-            displayPage(currentPage);
-            setupPagination();
-        });
+        pagination.appendChild(createPageItem("❯", currentPage + 1, currentPage === pageCount));
     }
 
-    function updatePagination() {
+    function updatePagination(tableId) {
         currentPage = 1;
-        displayPage(currentPage);
-        setupPagination();
+        displayPage(tableId, currentPage);
+        setupPagination(tableId);
     }
 
-    $("#searchInput").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        var hasMatch = false;
+    document.querySelectorAll("#searchInput").forEach(input => {
+        input.addEventListener("keyup", function () {
+            var value = this.value.toLowerCase();
+            var hasMatch = false;
+            let tableId = "clientTable"; // Adjust if using multiple tables
 
-        $("#clientTable tbody tr").each(function () {
-            var rowText = $(this).text().toLowerCase();
-            var isMatch = rowText.indexOf(value) > -1;
-            $(this).toggle(isMatch);
-            if (isMatch) {
-                hasMatch = true;
-            }
+            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+                var rowText = row.textContent.toLowerCase();
+                var isMatch = rowText.indexOf(value) > -1;
+                row.style.display = isMatch ? "" : "none";
+                if (isMatch) hasMatch = true;
+            });
+
+            document.getElementById("noResults").classList.toggle("d-none", hasMatch);
+            updatePagination(tableId);
         });
-
-        $("#noResults").toggleClass("d-none", hasMatch);
-        updatePagination();
     });
 
-    updatePagination();
+    updatePagination("clientTable");
 });

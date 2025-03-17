@@ -16,7 +16,12 @@
 
     <div class="mb-3">
         <label class="form-label">Designation</label>
-        <input type="text" class="form-control" @bind="EditingEmployee.Designation" required />
+        <select class="form-control" @bind="EditingEmployee.Designation">
+            @foreach (var designation in Enum.GetValues(typeof(Designation)))
+            {
+                <option value="@designation">@designation</option>
+            }
+        </select>
     </div>
 
     <div class="mb-3">
@@ -28,7 +33,6 @@
         <button class="btn btn-success" @onclick="SaveEmployee">Save Employee</button>
         <button class="btn btn-secondary" @onclick="Cancel">Cancel</button>
     </div>
-
 </div>
 
 @code {

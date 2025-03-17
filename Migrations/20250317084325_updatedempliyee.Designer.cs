@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Client_Invoice_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250311083128_EditResource")]
-    partial class EditResource
+    [Migration("20250317084325_updatedempliyee")]
+    partial class updatedempliyee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,13 +61,14 @@ namespace Client_Invoice_System.Migrations
 
                     b.Property<string>("ClientIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValueSql("NEWID()");
 
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CountryCurrencyId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Currency")
+                    b.Property<string>("CustomCurrency")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -90,6 +91,8 @@ namespace Client_Invoice_System.Migrations
 
                     b.HasKey("ClientId");
 
+                    b.HasIndex("CountryCurrencyId");
+
                     b.ToTable("Clients");
                 });
 
@@ -111,6 +114,36 @@ namespace Client_Invoice_System.Migrations
                     b.ToTable("ClientProfileCrosses");
                 });
 
+            modelBuilder.Entity("Client_Invoice_System.Models.CountryCurrency", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CountryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("CurrencyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CountryCurrencies");
+                });
+
             modelBuilder.Entity("Client_Invoice_System.Models.Employee", b =>
                 {
                     b.Property<int>("EmployeeId")
@@ -119,9 +152,8 @@ namespace Client_Invoice_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
 
-                    b.Property<string>("Designation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Designation")
+                        .HasColumnType("int");
 
                     b.Property<string>("EmployeeName")
                         .IsRequired()
@@ -146,7 +178,10 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Currency")
+                    b.Property<int>("CountryCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmailStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -163,39 +198,12 @@ namespace Client_Invoice_System.Migrations
 
                     b.HasIndex("ClientId");
 
+                    b.HasIndex("CountryCurrencyId");
+
                     b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("Client_Invoice_System.Models.OwnerProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BillingAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BillingEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OwnerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Owners");
-                });
-
-            modelBuilder.Entity("Client_Invoice_System.Models.PaymentProfile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -211,7 +219,30 @@ namespace Client_Invoice_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Currency")
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BeneficeryAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BillingAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BillingEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BranchAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CountryCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomCurrency")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -219,15 +250,23 @@ namespace Client_Invoice_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                    b.Property<string>("OwnerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Swiftcode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId")
-                        .IsUnique();
+                    b.HasIndex("CountryCurrencyId");
 
-                    b.ToTable("PaymentProfiles");
+                    b.ToTable("Owners");
                 });
 
             modelBuilder.Entity("Client_Invoice_System.Models.Resource", b =>
@@ -244,11 +283,11 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("ConsumedTotalHours")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ResourceName")
                         .IsRequired()
@@ -272,6 +311,17 @@ namespace Client_Invoice_System.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("Client_Invoice_System.Models.Client", b =>
+                {
+                    b.HasOne("Client_Invoice_System.Models.CountryCurrency", "CountryCurrency")
+                        .WithMany()
+                        .HasForeignKey("CountryCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CountryCurrency");
                 });
 
             modelBuilder.Entity("Client_Invoice_System.Models.ClientProfileCrossTable", b =>
@@ -301,18 +351,26 @@ namespace Client_Invoice_System.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("Client_Invoice_System.Models.PaymentProfile", b =>
-                {
-                    b.HasOne("Client_Invoice_System.Models.OwnerProfile", "Owner")
-                        .WithOne("PaymentProfile")
-                        .HasForeignKey("Client_Invoice_System.Models.PaymentProfile", "OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Client_Invoice_System.Models.CountryCurrency", "CountryCurrency")
+                        .WithMany()
+                        .HasForeignKey("CountryCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Owner");
+                    b.Navigation("Client");
+
+                    b.Navigation("CountryCurrency");
+                });
+
+            modelBuilder.Entity("Client_Invoice_System.Models.OwnerProfile", b =>
+                {
+                    b.HasOne("Client_Invoice_System.Models.CountryCurrency", "CountryCurrency")
+                        .WithMany()
+                        .HasForeignKey("CountryCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CountryCurrency");
                 });
 
             modelBuilder.Entity("Client_Invoice_System.Models.Resource", b =>
@@ -347,12 +405,6 @@ namespace Client_Invoice_System.Migrations
             modelBuilder.Entity("Client_Invoice_System.Models.Employee", b =>
                 {
                     b.Navigation("Resources");
-                });
-
-            modelBuilder.Entity("Client_Invoice_System.Models.OwnerProfile", b =>
-                {
-                    b.Navigation("PaymentProfile")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

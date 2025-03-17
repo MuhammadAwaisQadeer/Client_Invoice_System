@@ -17,7 +17,8 @@ namespace Client_Invoice_System.Services
             _config = config;
         }
 
-        public async Task<bool> SendInvoiceEmailAsync(string recipientEmail, byte[] invoicePdf, string fileName)
+        public async Task<bool> 
+            SendInvoiceEmailAsync(string recipientEmail, byte[] invoicePdf, string fileName)
         {
             try
             {
@@ -44,7 +45,7 @@ namespace Client_Invoice_System.Services
                     }.ToMessageBody()
                 };
 
-                message.From.Add(new MailboxAddress("Your Company", senderEmail));
+                message.From.Add(new MailboxAddress("Atrule Technologies Invoicing Updates", senderEmail));
                 message.To.Add(new MailboxAddress("", recipientEmail));
 
                 using var client = new MailKit.Net.Smtp.SmtpClient();

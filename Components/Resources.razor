@@ -21,25 +21,25 @@
                 <th>Resource Name</th>
                 <th>Employee</th>
                 <th>Consumed Hours</th>
-                <th>Contract Status</th> @* New Column *@
+                <th>Contract Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var resource in ResourcesList)
             {
-                var contractStatus = GetContractStatus(resource.DueDate);
-                var statusClass = contractStatus == "Active" ? "text-success fw-bold" : "text-danger fw-bold";
+                var statusClass = resource.IsActive ? "text-success fw-bold" : "text-danger fw-bold";
 
                 <tr>
                     <td>@(resource.Client?.Name ?? "Unknown")</td>
                     <td>@resource.ResourceName</td>
                     <td>@(resource.Employee?.EmployeeName ?? "Unknown")</td>
                     <td>@resource.ConsumedTotalHours</td>
-                    <td class="@statusClass">@contractStatus</td>
+                    <td class="@statusClass">@(resource.IsActive ? "Active" : "Ended")</td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => NavigateToEditResource(resource.ResourceId)">Edit</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteResource(resource.ResourceId)">Delete</button>
+                        <button class="btn btn-info btn-sm" @onclick="() => ToggleContractStatus(resource)">@(resource.IsActive ? "End Contract" : "Activate")</button>
                     </td>
                 </tr>
             }
@@ -57,14 +57,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
-        // Removed the loop that was resetting resource.Client
-    }
-
-    private string GetContractStatus(DateTime? dueDate)
-    {
-        if (!dueDate.HasValue || dueDate.Value == DateTime.MinValue)
-            return "Unknown";
-        return dueDate.Value >= DateTime.Today ? "Active" : "Ended";
     }
 
     private void NavigateToAddResource()
@@ -81,5 +73,12 @@ else
     {
         await ResourceRepository.DeleteAsync(resourceId);
         ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+    }
+
+    private async Task ToggleContractStatus(Resource resource)
+    {
+        resource.IsActive = !resource.IsActive; // Toggle status
+        await ResourceRepository.UpdateAsync(resource); // Update in DB
+        ResourcesList = (await ResourceRepository.GetAllAsync()).ToList(); // Refresh list
     }
 }

@@ -18,7 +18,8 @@ namespace Client_Invoice_System.Models
         public int EmployeeId { get; set; }
 
         public int ConsumedTotalHours { get; set; }
-        public DateTime DueDate { get; set; }
+        //public DateTime DueDate { get; set; }
+        public bool IsActive { get; set; } = true;
 
         // Navigation Properties
         public virtual Client Client { get; set; }

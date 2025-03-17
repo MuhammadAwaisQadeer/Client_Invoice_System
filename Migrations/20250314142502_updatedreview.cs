@@ -6,30 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Client_Invoice_System.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class updatedreview : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Clients",
+                name: "CountryCurrencies",
                 columns: table => new
                 {
-                    ClientId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CountryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CurrencyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Symbol = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CurrencyCode = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Clients", x => x.ClientId);
+                    table.PrimaryKey("PK_CountryCurrencies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,6 +43,32 @@ namespace Client_Invoice_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Clients",
+                columns: table => new
+                {
+                    ClientId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "N/A"),
+                    CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
+                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "NEWID()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clients", x => x.ClientId);
+                    table.ForeignKey(
+                        name: "FK_Clients_CountryCurrencies_CountryCurrencyId",
+                        column: x => x.CountryCurrencyId,
+                        principalTable: "CountryCurrencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Owners",
                 columns: table => new
                 {
@@ -55,12 +76,27 @@ namespace Client_Invoice_System.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BillingEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
+                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    BillingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Swiftcode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BranchAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BeneficeryAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IBANNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccountTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Owners", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Owners_CountryCurrencies_CountryCurrencyId",
+                        column: x => x.CountryCurrencyId,
+                        principalTable: "CountryCurrencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,29 +113,6 @@ namespace Client_Invoice_System.Migrations
                     table.PrimaryKey("PK_ActiveClients", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ActiveClients_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Invoices",
-                columns: table => new
-                {
-                    InvoiceId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsPaid = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Invoices", x => x.InvoiceId);
-                    table.ForeignKey(
-                        name: "FK_Invoices_Clients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "ClientId",
@@ -132,6 +145,36 @@ namespace Client_Invoice_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    InvoiceId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
+                    EmailStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.InvoiceId);
+                    table.ForeignKey(
+                        name: "FK_Invoices_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Invoices_CountryCurrencies_CountryCurrencyId",
+                        column: x => x.CountryCurrencyId,
+                        principalTable: "CountryCurrencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Resources",
                 columns: table => new
                 {
@@ -140,7 +183,8 @@ namespace Client_Invoice_System.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     ResourceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    ConsumedTotalHours = table.Column<int>(type: "int", nullable: false)
+                    ConsumedTotalHours = table.Column<int>(type: "int", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,29 +203,6 @@ namespace Client_Invoice_System.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "PaymentProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IBANNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccountTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OwnerId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaymentProfiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PaymentProfiles_Owners_OwnerId",
-                        column: x => x.OwnerId,
-                        principalTable: "Owners",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ActiveClients_ClientId",
                 table: "ActiveClients",
@@ -194,15 +215,24 @@ namespace Client_Invoice_System.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Clients_CountryCurrencyId",
+                table: "Clients",
+                column: "CountryCurrencyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Invoices_ClientId",
                 table: "Invoices",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymentProfiles_OwnerId",
-                table: "PaymentProfiles",
-                column: "OwnerId",
-                unique: true);
+                name: "IX_Invoices_CountryCurrencyId",
+                table: "Invoices",
+                column: "CountryCurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Owners_CountryCurrencyId",
+                table: "Owners",
+                column: "CountryCurrencyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Resources_ClientId",
@@ -228,19 +258,19 @@ namespace Client_Invoice_System.Migrations
                 name: "Invoices");
 
             migrationBuilder.DropTable(
-                name: "PaymentProfiles");
+                name: "Owners");
 
             migrationBuilder.DropTable(
                 name: "Resources");
-
-            migrationBuilder.DropTable(
-                name: "Owners");
 
             migrationBuilder.DropTable(
                 name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "CountryCurrencies");
         }
     }
 }

@@ -18,8 +18,8 @@ builder.Services.AddScoped<ResourceRepository>();
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ActiveClientRepository>();
-builder.Services.AddScoped<OwnerPaymentProfileRepository>();
 builder.Services.AddScoped<OwnerRepository>();
+builder.Services.AddScoped<CountryCurrencyRepository>();
 
 
 

@@ -79,10 +79,12 @@ namespace Client_Invoice_System.Services
                     ClientId = clientId,
                     InvoiceDate = DateTime.UtcNow,
                     TotalAmount = totalAmount,
-                    Currency = client.Currency ?? "USD",
+                    CountryCurrencyId = client?.CountryCurrencyId ?? default, // Assign the related currency
                     IsPaid = false,
                     EmailStatus = "Not Sent"
                 };
+
+                
 
                 await _context.Invoices.AddAsync(invoice);
                 await _context.SaveChangesAsync();
@@ -145,41 +147,33 @@ namespace Client_Invoice_System.Services
                 if (client == null)
                     throw new Exception("Client not found!");
 
-                var paymentProfile = await _context.PaymentProfiles.FirstOrDefaultAsync();
+                var paymentProfile = await _context.Owners.FirstOrDefaultAsync();
                 if (paymentProfile == null)
-                    throw new Exception("Payment profile not found!");
+                    throw new Exception("Owners Payment profile not found!");
 
                 decimal totalAmount = client.Resources.Sum(r => r.ConsumedTotalHours * r.Employee.HourlyRate);
 
                 // Determine culture based on client's currency
+                // Fetch currency symbol from the client's associated CountryCurrency table
                 CultureInfo culture;
-                string currencySymbol = "$"; // Default to USD
-                if (!string.IsNullOrEmpty(client.Currency))
+                string currencySymbol = client?.CountryCurrency?.Symbol ?? "$"; // Default to USD symbol
+
+                if (!string.IsNullOrEmpty(client?.CountryCurrency?.CurrencyCode))
                 {
-                    switch (client.Currency.ToUpper())
+                    try
                     {
-                        case "PKR":
-                            culture = new CultureInfo("ur-PK");
-                            currencySymbol = "₨";
-                            break;
-                        case "GBP":
-                            culture = new CultureInfo("en-GB");
-                            currencySymbol = "£";
-                            break;
-                        case "CAD":
-                            culture = new CultureInfo("en-CA");
-                            currencySymbol = "C$";
-                            break;
-                        default:
-                            culture = new CultureInfo("en-US");
-                            currencySymbol = "$";
-                            break;
+                        culture = new CultureInfo(client.CountryCurrency.CurrencyCode);
+                    }
+                    catch (CultureNotFoundException)
+                    {
+                        culture = new CultureInfo("en-US"); // Fallback to default
                     }
                 }
                 else
                 {
-                    culture = new CultureInfo("en-US");
+                    culture = new CultureInfo("en-US"); // Default if currency is not set
                 }
+
 
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -229,13 +223,13 @@ namespace Client_Invoice_System.Services
                                         table.Cell().Padding(2).Text(value);
                                     }
 
-                                    AddPaymentRow("Currency:", client.Currency ?? "USD");
-                                    AddPaymentRow("Bank Name:", "Habib Bank");
-                                    AddPaymentRow("Swift Code:", "HABBPKKA");
+                                    AddPaymentRow("Currency:", paymentProfile?.CountryCurrency?.CurrencyCode ?? "USD");
+                                    AddPaymentRow("Bank Name:", paymentProfile.BankName);
+                                    AddPaymentRow("Swift Code:", paymentProfile.Swiftcode);
                                     AddPaymentRow("Account Title:", paymentProfile.AccountTitle);
                                     AddPaymentRow("IBAN:", paymentProfile.IBANNumber);
-                                    AddPaymentRow("Branch Address:", "HBL IBB SADDAR BAZAR MULTAN");
-                                    AddPaymentRow("Beneficiary Address:", "2nd Floor, Khawar Centre, Multan Cantt");
+                                    AddPaymentRow("Branch Address:", paymentProfile.BranchAddress);
+                                    AddPaymentRow("Beneficiary Address:", paymentProfile.BeneficeryAddress);
                                 });
 
                                 col.Item().PaddingTop(10);

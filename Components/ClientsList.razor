@@ -3,23 +3,19 @@
 @using Client_Invoice_System.Models
 @using Client_Invoice_System.Repositories
 @using Client_Invoice_System.Repository
-@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @inject ClientRepository ClientRepo
 @inject NavigationManager Navigation
 
-<h3>Clients(@(clients?.Count ?? 0)) </h3>
+<h3>Clients (@(clients?.Count ?? 0))</h3>
 
 <div class="d-flex justify-content-end">
-
-
     <button class="btn btn-primary" @onclick="AddClient">Add New Client</button>
 </div>
 
 <div class="mt-5">
     <div class="card p-3 shadow-lg rounded-4 bg-white">
-        @* <h3 class="fw-bold text-center text-dark">🏢 Asset Vulnerability Impact</h3> *@
-        <input type="text" id="searchInput" class="form-control mb-3 w-20" placeholder="Search assets...">
-        <p id="noResults" class="text-center text-danger d-none">No matching records found.</p>
+        @* <input type="text" id="searchInput" class="form-control mb-3 w-20" placeholder="Search clients..."> *@
+        @* <p id="noResults" class="text-center text-danger d-none">No matching records found.</p> *@
 
         <div class="table-responsive">
             <table id="clientTable" class="table table-striped">
@@ -29,9 +25,8 @@
                         <th>Email</th>
                         <th>Address</th>
                         <th>Phone Number</th>
-                        <th>Currency</th>
                         <th>Country</th>
-                        <th>Due Date</th>
+                        <th>Currency</th>
                         <th>Client Identifier</th>
                         <th>Actions</th>
                     </tr>
@@ -46,9 +41,13 @@
                                 <td>@client.Email</td>
                                 <td>@client.Address</td>
                                 <td>@client.PhoneNumber</td>
-                                <td>@client.Currency</td>
-                                <td>@client.Country</td>
-                                <td>@client.DueDate.ToShortDateString()</td>
+                                <td>@(client.CountryCurrency?.CountryName ?? "N/A")</td>
+                                <td>
+                                    @(client.CustomCurrency?.Trim() != ""
+                                        ? client.CustomCurrency
+                                        : client.CountryCurrency?.CurrencyName ?? "N/A")
+                                    (@(client.CountryCurrency?.CurrencyCode ?? "-") - @(client.CountryCurrency?.Symbol ?? "-"))
+                                </td>
                                 <td>@client.ClientIdentifier</td>
                                 <td>
                                     <button class="btn btn-sm btn-warning me-2" @onclick="() => EditClient(client.ClientId)">Edit</button>
@@ -60,7 +59,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted">No clients found</td>
+                            <td colspan="8" class="text-center text-muted">No clients found</td>
                         </tr>
                     }
                 </tbody>
@@ -68,7 +67,6 @@
             <nav>
                 <ul class="pagination justify-content-center gap-2" id="pagination"></ul>
             </nav>
-
         </div>
     </div>
 </div>
@@ -80,7 +78,8 @@
     {
         try
         {
-            clients = (await ClientRepo.GetAllAsync()).ToList();
+            clients = (await ClientRepo.GetAllAsync(true)).ToList();
+
         }
         catch (Exception ex)
         {
@@ -90,26 +89,12 @@
 
     private void AddClient()
     {
-        try
-        {
-            Navigation.NavigateTo("/add-client");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Navigation error: {ex.Message}");
-        }
+        Navigation.NavigateTo("/add-client");
     }
 
     private void EditClient(int id)
     {
-        try
-        {
-            Navigation.NavigateTo($"/edit-client/{id}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Navigation error: {ex.Message}");
-        }
+        Navigation.NavigateTo($"/edit-client/{id}");
     }
 
     private async Task DeleteClient(int id)
@@ -117,12 +102,11 @@
         try
         {
             await ClientRepo.DeleteAsync(id);
-            clients = (await ClientRepo.GetAllAsync()).ToList(); 
+            clients = (await ClientRepo.GetAllAsync()).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error deleting client: {ex.Message}");
         }
     }
-
 }

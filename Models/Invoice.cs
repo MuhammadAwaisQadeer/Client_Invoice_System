@@ -14,10 +14,16 @@ namespace Client_Invoice_System.Models
         public virtual Client Client { get; set; }
 
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal TotalAmount { get; set; }  // Calculated based on resources used
 
-        public string Currency { get; set; }   // To handle multi-currency support
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalAmount { get; set; }  
+
+        [Required]
+        public int CountryCurrencyId { get; set; }
+
+        [ForeignKey("CountryCurrencyId")]
+        public virtual CountryCurrency CountryCurrency { get; set; }
+
         public string EmailStatus { get; set; } = "Not Sent";
         public bool IsPaid { get; set; } = false; // Payment status
     }

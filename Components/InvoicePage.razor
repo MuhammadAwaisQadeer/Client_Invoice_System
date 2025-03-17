@@ -16,7 +16,9 @@
         <option value="">-- Select Client --</option>
         @foreach (var client in Clients)
         {
-            <option value="@client.ClientId">@client.Name (@client.Currency)</option>
+            <option value="@client.ClientId">
+                @client.Name (@(client.CountryCurrency?.Symbol ?? client.CustomCurrency))
+            </option>
         }
     </select>
 </div>
@@ -46,8 +48,8 @@
                 <tr>
                     <td>@(invoice.Client?.Name ?? "Unknown")</td>
                     <td>@invoice.InvoiceDate.ToShortDateString()</td>
-                    <td>@invoice.TotalAmount.ToString("C2", new System.Globalization.CultureInfo(invoice.Currency ?? "en-US"))</td>
-                    <td>@(invoice.Currency ?? "USD")</td>
+                    <td>@(invoice.CountryCurrency?.Symbol) @invoice.TotalAmount.ToString("N2")</td>
+                    <td>@(invoice.CountryCurrency?.CurrencyName )</td>
                     <td>
                         <span class="badge @(invoice.IsPaid ? "bg-success" : "bg-danger")">
                             @(invoice.IsPaid ? "Paid" : "Unpaid")
@@ -71,7 +73,7 @@
         else
         {
             <tr>
-                <td colspan="6" class="text-center text-muted">No invoices found</td>
+                <td colspan="7" class="text-center text-muted">No invoices found</td>
             </tr>
         }
     </tbody>
@@ -86,7 +88,7 @@
     {
         try
         {
-            Clients = (await ClientRepo.GetAllAsync()).ToList();
+            Clients = (await ClientRepo.GetAllAsync( true)).ToList();
             Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
         }
         catch (Exception ex)
@@ -158,6 +160,7 @@
             Console.WriteLine($"Error generating invoice: {ex.Message}");
         }
     }
+
     private async Task MarkAsPaid(int invoiceId)
     {
         try

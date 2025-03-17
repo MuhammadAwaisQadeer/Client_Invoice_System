@@ -15,12 +15,18 @@
 @if (Owners != null && Owners.Any())
 {
     <table class="table table-striped">
-        <thead >
+        <thead>
             <tr>
                 <th>Owner Name</th>
                 <th>Billing Email</th>
                 <th>Phone Number</th>
                 <th>Billing Address</th>
+               
+                <th>IBAN Number</th>
+               
+                <th>Account Number</th>
+                <th>Country</th>
+                <th>Currency</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -32,6 +38,16 @@
                     <td>@owner.BillingEmail</td>
                     <td>@owner.PhoneNumber</td>
                     <td>@owner.BillingAddress</td>
+                    
+                    <td>@owner.IBANNumber</td>
+                    <td>@owner.AccountNumber</td>
+                    <td>@(owner.CountryCurrency?.CountryName ?? "N/A")</td>
+                    <td>
+                        @(owner.CustomCurrency?.Trim() != ""
+                            ? owner.CustomCurrency
+                            : owner.CountryCurrency?.CurrencyName ?? "N/A")
+                        (@(owner.CountryCurrency?.CurrencyCode ?? "-") - @(owner.CountryCurrency?.Symbol ?? "-"))
+                    </td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => EditOwnerProfile(owner.Id)">Edit</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteOwnerProfile(owner.Id)">Delete</button>
@@ -57,7 +73,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading owner profiles: {ex.Message}");
+            Console.WriteLine($"❌ Error loading owner profiles: {ex.Message}");
         }
     }
 
@@ -80,7 +96,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting owner profile: {ex.Message}");
+            Console.WriteLine($"❌ Error deleting owner profile: {ex.Message}");
         }
     }
 }

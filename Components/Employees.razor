@@ -17,7 +17,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Employee ID</th>
+              
                 <th>Name</th>
                 <th>Designation</th>
                 <th>Hourly Rate</th>
@@ -28,7 +28,7 @@
             @foreach (var employee in employees)
             {
                 <tr>
-                    <td>@employee.EmployeeId</td>
+                   
                     <td>@employee.EmployeeName</td>
                     <td>@employee.Designation</td>
                     <td>@employee.HourlyRate.ToString("C", new CultureInfo("en-US"))</td>

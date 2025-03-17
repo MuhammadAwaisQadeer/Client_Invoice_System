@@ -1,5 +1,8 @@
 ﻿using Client_Invoice_System.Data;
+using Client_Invoice_System.Models;
+using Client_Invoice_System.Repository;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,10 +20,19 @@ namespace Client_Invoice_System.Repositories
             _dbSet = _context.Set<T>();
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(bool includeRelatedEntities = false)
         {
-            return await _dbSet.AsNoTracking().ToListAsync();
+            IQueryable<T> query = _context.Set<T>();
+
+            if (includeRelatedEntities && typeof(T) == typeof(Client))
+            {
+                query = query.Include("CountryCurrency");
+            }
+
+            return await query.ToListAsync(); 
         }
+
+
 
         public virtual async Task<T> GetByIdAsync(int id)
         {

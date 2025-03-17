@@ -12,10 +12,11 @@ namespace Client_Invoice_System.Repository
     {
         public EmployeeRepository(ApplicationDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Employee>> GetByDesignationAsync(string designation)
+        public async Task<IEnumerable<Employee>> GetByDesignationAsync(Designation designation)
         {
             return await _dbSet.Where(e => e.Designation == designation).ToListAsync();
         }
+
 
         public async Task<decimal> CalculateTotalEarningsAsync(int employeeId)
         {

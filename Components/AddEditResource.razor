@@ -42,10 +42,10 @@
         <label class="form-label">Consumed Hours</label>
         <input type="number" class="form-control" @bind="EditingResource.ConsumedTotalHours" />
     </div>
-    <div class="mb-3">
-        <label class="form-label">Contract Due Date</label>
-        <input type="date" class="form-control" @bind="EditingResource.DueDate" />
-    </div>
+    @* <div class="mb-3"> *@
+    @*     <label class="form-label">Contract Due Date</label> *@
+    @*     <input type="date" class="form-control" @bind="EditingResource.DueDate" /> *@
+    @* </div> *@
 
     <div class="d-flex justify-content-end gap-2">
         <button class="btn btn-success" @onclick="SaveResource">@(EditingResource.ResourceId == 0 ? "Add" : "Update") Resource</button>
@@ -63,10 +63,10 @@
     {
         Clients = (await ClientRepository.GetAllAsync()).ToList();
         Employees = (await EmployeeRepository.GetAllAsync()).ToList();
-        if (EditingResource.DueDate == null || EditingResource.DueDate == DateTime.MinValue)
-        {
-            EditingResource.DueDate = DateTime.Today;
-        }
+        // if (EditingResource.DueDate == null || EditingResource.DueDate == DateTime.MinValue)
+        // {
+        //     EditingResource.DueDate = DateTime.Today;
+        // }
         if (ResourceId.HasValue)
         {
             EditingResource = await ResourceRepository.GetByIdAsync(ResourceId.Value) ?? new();

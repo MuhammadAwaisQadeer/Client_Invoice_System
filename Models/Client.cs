@@ -1,14 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Client_Invoice_System.Models
 {
     public class Client
     {
-        public Client()
-        {
-            // Assign a default unique identifier
-            ClientIdentifier = Guid.NewGuid().ToString();
-        }
+        
 
         [Key]
         public int ClientId { get; set; }
@@ -21,11 +18,14 @@ namespace Client_Invoice_System.Models
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public string Currency { get; set; }
+        public int CountryCurrencyId { get; set; }
+
+        [ForeignKey("CountryCurrencyId")]
+        public virtual CountryCurrency CountryCurrency { get; set; }
+
+        public string? CustomCurrency { get; set; }
         [Required]
-        public string Country { get; set; }
-        [Required]
-        public DateTime DueDate { get; set; }
+        public DateTime DueDate { get; set; } = DateTime.Now;
         [Required]
         public string ClientIdentifier { get; set; }
 
