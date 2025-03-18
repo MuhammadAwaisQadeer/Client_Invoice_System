@@ -1,0 +1,148 @@
+﻿@page "/resources"
+@rendermode InteractiveServer
+@using Client_Invoice_System.Models
+@using Client_Invoice_System.Repository
+@inject NavigationManager Navigation
+@inject ResourceRepository ResourceRepository
+@inject EmployeeRepository EmployeeRepository
+@inject ClientRepository ClientRepository
+
+<h3>Manage Contracts (@(ResourcesList?.Count ?? 0))</h3>
+<div class="d-flex justify-content-end">
+    <button class="btn btn-primary mb-3" @onclick="NavigateToAddResource">Add Contract</button>
+</div>
+
+@if (ResourcesList != null && ResourcesList.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Resource Name</th>
+                <th>Employee</th>
+                <th>Consumed Hours</th>
+                <th>Contract Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var resource in ResourcesList)
+            {
+                var statusClass = resource.IsActive ? "text-success fw-bold" : "text-danger fw-bold";
+
+                <tr>
+                    <td>@(resource.Client?.Name ?? "Unknown")</td>
+                    <td>@resource.ResourceName</td>
+                    <td>@(resource.Employee?.EmployeeName ?? "Unknown")</td>
+                    <td>@resource.ConsumedTotalHours</td>
+                    <td class="@statusClass">@(resource.IsActive ? "Active" : "Ended")</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => NavigateToEditResource(resource.ResourceId)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => ShowDeleteModal(resource.ResourceId, resource.ResourceName)">Delete</button>
+                        <button class="btn btn-info btn-sm" @onclick="() => ToggleContractStatus(resource)">@(resource.IsActive ? "End Contract" : "Activate")</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (isDeleteModalVisible)
+{
+    <div class="modal-overlay">
+        <div class="delete-modal">
+            <p class="fw-bold">Are you sure you want to delete <span class="text-danger">@resourceToDeleteName</span>?</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Yes, Delete</button>
+                <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+        z-index: 1050;
+    }
+
+    .delete-modal {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+    }
+</style>
+
+@code {
+    private List<Resource> ResourcesList = new();
+    private bool isDeleteModalVisible = false;
+    private int resourceToDelete;
+    private string resourceToDeleteName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+    }
+
+    private void NavigateToAddResource()
+    {
+        Navigation.NavigateTo("/add-edit-resource");
+    }
+
+    private void NavigateToEditResource(int resourceId)
+    {
+        Navigation.NavigateTo($"/add-edit-resource/{resourceId}");
+    }
+
+    private void ShowDeleteModal(int resourceId, string name)
+    {
+        resourceToDelete = resourceId;
+        resourceToDeleteName = name;
+        isDeleteModalVisible = true;
+    }
+
+    private void CancelDelete()
+    {
+        isDeleteModalVisible = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        try
+        {
+            await ResourceRepository.DeleteAsync(resourceToDelete);
+            ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting resource: {ex.Message}");
+        }
+        finally
+        {
+            isDeleteModalVisible = false;
+        }
+    }
+
+    private async Task ToggleContractStatus(Resource resource)
+    {
+        resource.IsActive = !resource.IsActive;
+        await ResourceRepository.UpdateAsync(resource);
+        ResourcesList = (await ResourceRepository.GetAllAsync()).ToList();
+    }
+}
