@@ -1,0 +1,120 @@
+﻿/* General Styling */
+body {
+    background: #f8f9fa;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dashboard-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Filter Section */
+.filter-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Order Card Styling */
+.order-card {
+    width: 100%; /* Ensures cards take full width of their column */
+    min-height: 280px; /* Increased height for better visual appeal */
+    padding: 35px; /* More space inside */
+    border-radius: 18px; /* Smoother rounded edges */
+    font-size: 22px; /* Larger text for better readability */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Softer shadows */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    color: white; /* Ensures text is visible */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Improves text contrast */
+}
+
+    .order-card:hover {
+        transform: translateY(-8px); /* Softer hover effect */
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+/* Background Colors (Adjusted for Lighter Appearance) */
+.bg-c-blue {
+    background: linear-gradient(135deg, #3a7bd5, #1e5799);
+}
+
+.bg-c-green {
+    background: linear-gradient(135deg, #34c759, #1e8c3f);
+}
+
+.bg-c-red {
+    background: linear-gradient(135deg, #ff3b30, #c62828);
+}
+
+.bg-c-purple {
+    background: linear-gradient(135deg, #8e44ad, #5e2d84);
+}
+
+.bg-c-orange {
+    background: linear-gradient(135deg, #ffa502, #e67e22);
+}
+
+/* Icon Styling */
+.icon-style {
+    font-size: 60px; /* Increased size for better visibility */
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 12px;
+}
+
+/* Ensure Values in Cards are Visible */
+.order-card .card-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: white; /* Ensures value text is visible */
+}
+
+/* Responsive Grid */
+.row-cols-md-3 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px; /* Increased spacing for a clean look */
+    padding: 25px; /* More breathing room */
+}
+
+/* Fix Button Spacing */
+.filter-section .btn {
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Fix "Apply Filters" button alignment */
+@media (max-width: 768px) {
+    .col-md-4.mt-3 {
+        display: flex;
+        justify-content: center;
+    }
+
+    .order-card {
+        max-width: 420px;
+        min-height: 250px;
+    }
+}
+
+/* Ensure spacing between filter section and dashboard */
+.mt-3 {
+    margin-top: 30px !important;
+}
+
+.mb-4 {
+    margin-bottom: 40px !important;
+}

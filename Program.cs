@@ -16,6 +16,7 @@ builder.Services.AddScoped<ClientRepository>();
 builder.Services.AddScoped<EmployeeRepository>();
 builder.Services.AddScoped<ResourceRepository>();
 builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<InvoiceRepository>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ActiveClientRepository>();
 builder.Services.AddScoped<OwnerRepository>();

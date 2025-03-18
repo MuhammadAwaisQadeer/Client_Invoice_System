@@ -13,7 +13,15 @@ namespace Client_Invoice_System.Repository
         public ClientRepository(ApplicationDbContext context) : base(context) { }
 
 
+        public async Task<List<Client>> GetAllClientsWithDetailsAsync()
+        {
+            return await _context.Clients.Include(c => c.CountryCurrency).AsNoTracking().ToListAsync();
+        }
 
+        public async Task<int> GetActiveClientsCountAsync()
+        {
+            return await _context.Clients.CountAsync();
+        }
         public async Task<bool> EmailExistsAsync(string email)
         {
             try
