@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Client_Invoice_System.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,13 +19,12 @@ namespace Client_Invoice_System.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "N/A"),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "NEWID()")
                 },
                 constraints: table =>
                 {
@@ -93,6 +92,7 @@ namespace Client_Invoice_System.Migrations
                     InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmailStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -140,7 +140,8 @@ namespace Client_Invoice_System.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     ResourceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    ConsumedTotalHours = table.Column<int>(type: "int", nullable: false)
+                    ConsumedTotalHours = table.Column<int>(type: "int", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -16,8 +16,14 @@ namespace Client_Invoice_System.Models
         public string PhoneNumber { get; set; }
         public string BillingAddress { get; set; }
 
-        // Navigation Property
-        public virtual PaymentProfile PaymentProfile { get; set; }
+        [Required]
+        public string IBANNumber { get; set; }
+
+        public string Currency { get; set; }
+
+        public string AccountTitle { get; set; }
+
+        public string AccountNumber { get; set; }
     }
 
 

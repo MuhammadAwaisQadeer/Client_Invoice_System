@@ -7,56 +7,61 @@
 @inject ClientRepository ClientRepo
 @inject NavigationManager Navigation
 
-<h3 class="text-primary">@(ClientId == 0 ? "Add Client" : "Edit Client")</h3>
-<EditForm Model="client" OnValidSubmit="SaveClient">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg p-4 rounded" style="width: 450px;">
+        <h3 class="text-center text-primary mb-4">@(ClientId == 0 ? "Add Client" : "Edit Client")</h3>
 
-    <div class="card shadow p-4">
-        <div class="mb-3">
-            <label class="form-label">Name:</label>
-            <InputText class="form-control" @bind-Value="client.Name" />
-        </div>
+        <EditForm Model="client" OnValidSubmit="SaveClient">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-        <div class="mb-3">
-            <label class="form-label">Email:</label>
-            <InputText class="form-control" type="email" @bind-Value="client.Email" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Address:</label>
-            <InputText class="form-control" @bind-Value="client.Address" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Name:</label>
+                <InputText class="form-control" @bind-Value="client.Name" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Phone Number:</label>
-            <InputText class="form-control"  @bind-Value="client.PhoneNumber" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Email:</label>
+                <InputText class="form-control" type="email" @bind-Value="client.Email" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Currency:</label>
-            <InputText class="form-control" @bind-Value="client.Currency" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Address:</label>
+                <textarea class="form-control" @bind="client.Address" rows="2" style="min-height: 40px; max-height: 150px; overflow-y: auto;"></textarea>
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Country:</label>
-            <InputText class="form-control" @bind-Value="client.Country" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Phone Number:</label>
+                <InputText class="form-control" @bind-Value="client.PhoneNumber" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Due Date:</label>
-            <InputDate class="form-control" @bind-Value="client.DueDate" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Currency:</label>
+                <InputText class="form-control" @bind-Value="client.Currency" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Client Identifier:</label>
-            <InputText class="form-control" @bind-Value="client.ClientIdentifier" maxlength="3" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Country:</label>
+                <InputText class="form-control" @bind-Value="client.Country" />
+            </div>
 
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">Save</button>
-        </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Due Date:</label>
+                <InputDate class="form-control" @bind-Value="client.DueDate" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Client Identifier:</label>
+                <InputText class="form-control" @bind-Value="client.ClientIdentifier" maxlength="5" />
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary px-4 py-2">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+        </EditForm>
     </div>
-</EditForm>
+</div>
 
 @code {
     [Parameter] public int ClientId { get; set; }
@@ -81,6 +86,10 @@
             await ClientRepo.UpdateAsync(client);
         }
 
+        Navigation.NavigateTo("/clients");
+    }
+    private async Task Cancel()
+    {
         Navigation.NavigateTo("/clients");
     }
 }

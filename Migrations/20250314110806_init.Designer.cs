@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Client_Invoice_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250311074935_updateclient")]
-    partial class updateclient
+    [Migration("20250314110806_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,7 +61,9 @@ namespace Client_Invoice_System.Migrations
 
                     b.Property<string>("ClientIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("Country")
                         .IsRequired()
@@ -83,7 +85,10 @@ namespace Client_Invoice_System.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("N/A");
 
                     b.HasKey("ClientId");
 
@@ -144,6 +149,10 @@ namespace Client_Invoice_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmailStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

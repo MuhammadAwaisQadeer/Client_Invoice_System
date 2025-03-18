@@ -3,7 +3,6 @@
 @using Client_Invoice_System.Models
 @using Client_Invoice_System.Repository
 @using Client_Invoice_System.Services
-
 @inject InvoiceService InvoiceService
 @inject ClientRepository ClientRepo
 @inject IJSRuntime JS
@@ -60,7 +59,7 @@
                     </td>
                     <td>
                         <button class="btn btn-sm btn-primary" @onclick="() => DownloadInvoice(invoice.ClientId)">Download</button>
-                        <button class="btn btn-sm btn-success" @onclick="() => SendInvoice(invoice.ClientId)">Send Email</button>
+                        <button class="btn btn-sm btn-success" @onclick="() => ConfirmInvoice(invoice.ClientId)">Send Email</button>
                         <button class="btn btn-sm btn-warning" @onclick="() => MarkAsPaid(invoice.InvoiceId)" disabled="@invoice.IsPaid">
                             Mark as Paid
                         </button>
@@ -77,11 +76,32 @@
     </tbody>
 </table>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to Send Invoice via Email?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick="SendInvoice">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @code {
+
     private List<Client> Clients = new();
     private List<Invoice> Invoices = new();
     private int SelectedClientId;
 
+    private int clientId;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -115,7 +135,7 @@
         }
     }
 
-    private async Task SendInvoice(int clientId)
+    private async Task SendInvoice()
     {
         try
         {
@@ -169,5 +189,11 @@
         {
             Console.WriteLine($"Error marking invoice as paid: {ex.Message}");
         }
+    }
+
+    private async Task ConfirmInvoice(int id)
+    {
+        clientId = id;
+        await JS.InvokeVoidAsync("ShowDeleteModal");
     }
 }

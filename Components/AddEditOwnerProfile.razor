@@ -7,32 +7,62 @@
 @inject OwnerRepository OwnerRepository
 @inject NavigationManager Navigation
 
-<h3 class="text-primary">@((Owner.Id == 0) ? "Add Owner Profile" : "Edit Owner Profile")</h3>
+<h3 class="text-primary text-center">@((Owner.Id == 0) ? "Add Owner Profile" : "Edit Owner Profile")</h3>
 
-<div class="card p-4">
-    <div class="mb-3">
-        <label class="form-label">Owner Name</label>
-        <input type="text" class="form-control" @bind="Owner.OwnerName" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Billing Email</label>
-        <input type="email" class="form-control" @bind="Owner.BillingEmail" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Phone Number</label>
-        <input type="tel" class="form-control" @bind="Owner.PhoneNumber" />
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Billing Address</label>
-        <textarea class="form-control" @bind="Owner.BillingAddress"></textarea>
-    </div>
+<EditForm Model="Owner" OnValidSubmit="SaveOwnerProfile">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-    <div class="d-flex justify-content-end">
-        <button class="btn btn-secondary me-3" @onclick="Cancel">Cancel</button>
-        <button class="btn btn-primary" @onclick="SaveOwnerProfile">Save</button>
-    </div>
+    <div class="d-flex justify-content-center">
+        <div class="card shadow p-4" style="max-width: 500px; width: 100%;">
 
-</div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Owner Name</label>
+                <InputText class="form-control" @bind-Value="Owner.OwnerName" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Billing Email</label>
+                <InputText class="form-control" type="email" @bind-Value="Owner.BillingEmail" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Phone Number</label>
+                <InputText class="form-control" type="tel" @bind-Value="Owner.PhoneNumber" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Billing Address</label>
+                <InputTextArea class="form-control" @bind-Value="Owner.BillingAddress" rows="2" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">IBAN</label>
+                <InputText class="form-control" @bind-Value="Owner.IBANNumber" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Currency</label>
+                <InputText class="form-control" @bind-Value="Owner.Currency" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Account Title</label>
+                <InputText class="form-control" @bind-Value="Owner.AccountTitle" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Account Number</label>
+                <InputText class="form-control" type="number" @bind-Value="Owner.AccountNumber" required />
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
 
 @code {
     [Parameter] public int? OwnerId { get; set; }

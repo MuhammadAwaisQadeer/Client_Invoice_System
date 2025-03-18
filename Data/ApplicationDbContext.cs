@@ -31,13 +31,7 @@ namespace Client_Invoice_System.Data
              .HasDefaultValue("N/A");
             modelBuilder.Entity<Client>()
             .Property(c => c.ClientIdentifier)
-            .HasDefaultValueSql("NEWID()");
-            // ✅ Owner & Payment Profile Relationship
-            modelBuilder.Entity<OwnerProfile>()
-                .HasOne(o => o.PaymentProfile)
-                .WithOne(p => p.Owner)
-                .HasForeignKey<PaymentProfile>(p => p.OwnerId)
-                .OnDelete(DeleteBehavior.Cascade);  // ✅ Ensures PaymentProfile is deleted when Owner is deleted
+            .HasDefaultValueSql("NEWID()");  // ✅ Ensures PaymentProfile is deleted when Owner is deleted
 
             // ✅ Client & Resources Relationship (Fixes Orphaned Resources)
             modelBuilder.Entity<Client>()

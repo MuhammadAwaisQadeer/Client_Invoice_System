@@ -4,11 +4,6 @@ namespace Client_Invoice_System.Models
 {
     public class Client
     {
-        public Client()
-        {
-            // Assign a default unique identifier
-            ClientIdentifier = Guid.NewGuid().ToString();
-        }
 
         [Key]
         public int ClientId { get; set; }
