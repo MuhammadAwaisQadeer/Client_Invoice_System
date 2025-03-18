@@ -49,7 +49,7 @@
                     <td>@(invoice.Client?.Name ?? "Unknown")</td>
                     <td>@invoice.InvoiceDate.ToShortDateString()</td>
                     <td>@(invoice.CountryCurrency?.Symbol) @invoice.TotalAmount.ToString("N2")</td>
-                    <td>@(invoice.CountryCurrency?.CurrencyName )</td>
+                    <td>@(invoice.CountryCurrency?.CurrencyName)</td>
                     <td>
                         <span class="badge @(invoice.IsPaid ? "bg-success" : "bg-danger")">
                             @(invoice.IsPaid ? "Paid" : "Unpaid")
@@ -62,8 +62,8 @@
                     </td>
                     <td>
                         <button class="btn btn-sm btn-primary" @onclick="() => DownloadInvoice(invoice.ClientId)">Download</button>
-                        <button class="btn btn-sm btn-success" @onclick="() => SendInvoice(invoice.ClientId)">Send Email</button>
-                        <button class="btn btn-sm btn-warning" @onclick="() => MarkAsPaid(invoice.InvoiceId)" disabled="@invoice.IsPaid">
+                        <button class="btn btn-sm btn-success" @onclick="() => ShowSendEmailModal(invoice.ClientId, invoice.Client?.Name)">Send Email</button>
+                        <button class="btn btn-sm btn-warning" @onclick="() => ShowMarkAsPaidModal(invoice.InvoiceId, invoice.Client?.Name)" disabled="@invoice.IsPaid">
                             Mark as Paid
                         </button>
                     </td>
@@ -79,16 +79,74 @@
     </tbody>
 </table>
 
+<!-- Send Email Confirmation Modal -->
+@if (isSendEmailModalVisible)
+{
+    <div class="modal-overlay">
+        <div class="delete-modal">
+            <p class="fw-bold">Are you sure you want to send an email to <span class="text-primary">@modalClientName</span>?</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-success" @onclick="ConfirmSendEmail">Yes, Send</button>
+                <button class="btn btn-secondary" @onclick="CancelSendEmail">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Mark as Paid Confirmation Modal -->
+@if (isMarkAsPaidModalVisible)
+{
+    <div class="modal-overlay">
+        <div class="delete-modal">
+            <p class="fw-bold">Mark invoice for <span class="text-success">@modalClientName</span> as Paid?</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-warning" @onclick="ConfirmMarkAsPaid">Yes, Mark as Paid</button>
+                <button class="btn btn-secondary" @onclick="CancelMarkAsPaid">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1050;
+    }
+
+    .delete-modal {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+    }
+</style>
+
 @code {
     private List<Client> Clients = new();
     private List<Invoice> Invoices = new();
     private int SelectedClientId;
 
+    private bool isSendEmailModalVisible = false;
+    private bool isMarkAsPaidModalVisible = false;
+    private int modalInvoiceId;
+    private int modalClientId;
+    private string modalClientName;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Clients = (await ClientRepo.GetAllAsync( true)).ToList();
+            Clients = (await ClientRepo.GetAllAsync(true)).ToList();
             Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
         }
         catch (Exception ex)
@@ -96,49 +154,6 @@
             Console.WriteLine($"Error loading invoices: {ex.Message}");
         }
     }
-
-    private async Task DownloadInvoice(int clientId)
-    {
-        try
-        {
-            if (clientId <= 0)
-            {
-                Console.WriteLine("Invalid Client ID");
-                return;
-            }
-
-            byte[] pdfData = await InvoiceService.GenerateInvoicePdfAsync(clientId);
-            var fileName = $"Invoice_{clientId}.pdf";
-            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, new DotNetStreamReference(new MemoryStream(pdfData)), "application/pdf");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error downloading invoice: {ex.Message}");
-        }
-    }
-
-    private async Task SendInvoice(int clientId)
-    {
-        try
-        {
-            if (clientId <= 0)
-            {
-                Console.WriteLine("Invalid Client ID");
-                return;
-            }
-
-            bool emailSent = await InvoiceService.SendInvoiceToClientAsync(clientId);
-            Console.WriteLine(emailSent ? "Invoice email sent." : "Failed to send invoice email.");
-
-            // Refresh invoices to update UI
-            Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending invoice: {ex.Message}");
-        }
-    }
-
     private async Task GenerateInvoice()
     {
         try
@@ -160,17 +175,82 @@
             Console.WriteLine($"Error generating invoice: {ex.Message}");
         }
     }
-
-    private async Task MarkAsPaid(int invoiceId)
+    private async Task DownloadInvoice(int clientId)
     {
         try
         {
-            await InvoiceService.MarkInvoiceAsPaidAsync(invoiceId);
+            if (clientId <= 0)
+            {
+                Console.WriteLine("Invalid Client ID");
+                return;
+            }
+
+            byte[] pdfData = await InvoiceService.GenerateInvoicePdfAsync(clientId);
+            var fileName = $"Invoice_{clientId}.pdf";
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, new DotNetStreamReference(new MemoryStream(pdfData)), "application/pdf");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading invoice: {ex.Message}");
+        }
+    }
+
+    private void ShowSendEmailModal(int clientId, string clientName)
+    {
+        modalClientId = clientId;
+        modalClientName = clientName;
+        isSendEmailModalVisible = true;
+    }
+
+    private void CancelSendEmail()
+    {
+        isSendEmailModalVisible = false;
+    }
+
+    private async Task ConfirmSendEmail()
+    {
+        try
+        {
+            bool emailSent = await InvoiceService.SendInvoiceToClientAsync(modalClientId);
+            Console.WriteLine(emailSent ? "Invoice email sent." : "Failed to send invoice email.");
+            Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending invoice: {ex.Message}");
+        }
+        finally
+        {
+            isSendEmailModalVisible = false;
+        }
+    }
+
+    private void ShowMarkAsPaidModal(int invoiceId, string clientName)
+    {
+        modalInvoiceId = invoiceId;
+        modalClientName = clientName;
+        isMarkAsPaidModalVisible = true;
+    }
+
+    private void CancelMarkAsPaid()
+    {
+        isMarkAsPaidModalVisible = false;
+    }
+
+    private async Task ConfirmMarkAsPaid()
+    {
+        try
+        {
+            await InvoiceService.MarkInvoiceAsPaidAsync(modalInvoiceId);
             Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error marking invoice as paid: {ex.Message}");
+        }
+        finally
+        {
+            isMarkAsPaidModalVisible = false;
         }
     }
 }

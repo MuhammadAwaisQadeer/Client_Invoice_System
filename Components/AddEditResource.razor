@@ -7,52 +7,55 @@
 @inject EmployeeRepository EmployeeRepository
 @inject ClientRepository ClientRepository
 
-<h4>@(EditingResource.ResourceId == 0 ? "Add Resource" : "Edit Resource")</h4>
+<h3 class="text-primary text-center">@(ResourceId == null ? "Add Resource" : "Edit Resource")</h3>
 
-<div class="card p-3">
-    <div class="mb-3">
-        <label class="form-label">Client</label>
-        <select class="form-control" @bind="EditingResource.ClientId">
-            <option value="">Select Client</option>
-            @foreach (var client in Clients)
-            {
-                <option value="@client.ClientId">@client.Name</option>
-            }
-        </select>
+<EditForm Model="EditingResource" OnValidSubmit="SaveResource">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
+    <div class="d-flex justify-content-center">
+        <div class="card shadow p-4" style="max-width: 500px; width: 100%;">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Client</label>
+                <InputSelect class="form-control" @bind-Value="EditingResource.ClientId">
+                    <option value="">Select Client</option>
+                    @foreach (var client in Clients)
+                    {
+                        <option value="@client.ClientId">@client.Name</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Resource Name</label>
+                <InputText class="form-control" @bind-Value="EditingResource.ResourceName" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Employee</label>
+                <InputSelect class="form-control" @bind-Value="EditingResource.EmployeeId">
+                    <option value="">Select Employee</option>
+                    @foreach (var emp in Employees)
+                    {
+                        <option value="@emp.EmployeeId">@emp.EmployeeName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Consumed Hours</label>
+                <InputNumber class="form-control" @bind-Value="EditingResource.ConsumedTotalHours" step="0.01" required />
+            </div>
+
+           
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary">@(EditingResource.ResourceId == 0 ? "Add" : "Update") Resource</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Resource Name</label>
-        <input type="text" class="form-control" @bind="EditingResource.ResourceName" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Employee</label>
-        <select class="form-control" @bind="EditingResource.EmployeeId">
-            <option value="">Select Employee</option>
-            @foreach (var emp in Employees)
-            {
-                <option value="@emp.EmployeeId">@emp.EmployeeName</option>
-            }
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Consumed Hours</label>
-        <input type="number" class="form-control" @bind="EditingResource.ConsumedTotalHours" />
-    </div>
-    @* <div class="mb-3"> *@
-    @*     <label class="form-label">Contract Due Date</label> *@
-    @*     <input type="date" class="form-control" @bind="EditingResource.DueDate" /> *@
-    @* </div> *@
-
-    <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-success" @onclick="SaveResource">@(EditingResource.ResourceId == 0 ? "Add" : "Update") Resource</button>
-        <button class="btn btn-secondary ms-2" @onclick="Cancel">Cancel</button>
-    </div>
-</div>
-
+</EditForm>
 @code {
     [Parameter] public int? ResourceId { get; set; }
     private Resource EditingResource = new();

@@ -21,9 +21,7 @@
                 <th>Billing Email</th>
                 <th>Phone Number</th>
                 <th>Billing Address</th>
-               
                 <th>IBAN Number</th>
-               
                 <th>Account Number</th>
                 <th>Country</th>
                 <th>Currency</th>
@@ -38,7 +36,6 @@
                     <td>@owner.BillingEmail</td>
                     <td>@owner.PhoneNumber</td>
                     <td>@owner.BillingAddress</td>
-                    
                     <td>@owner.IBANNumber</td>
                     <td>@owner.AccountNumber</td>
                     <td>@(owner.CountryCurrency?.CountryName ?? "N/A")</td>
@@ -50,7 +47,7 @@
                     </td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => EditOwnerProfile(owner.Id)">Edit</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteOwnerProfile(owner.Id)">Delete</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => ShowDeleteModal(owner.Id, owner.OwnerName)">Delete</button>
                     </td>
                 </tr>
             }
@@ -62,8 +59,49 @@ else
     <p class="text-muted text-center">No owner profiles found.</p>
 }
 
+<!-- Delete Confirmation Modal -->
+@if (isDeleteModalVisible)
+{
+    <div class="modal-overlay">
+        <div class="delete-modal">
+            <p class="fw-bold">Are you sure you want to delete <span class="text-danger">@ownerToDeleteName</span>?</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-danger" @onclick="ConfirmDelete">Yes, Delete</button>
+                <button class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+        z-index: 1050;
+    }
+
+    .delete-modal {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+    }
+</style>
+
 @code {
     private List<OwnerProfile> Owners = new();
+    private bool isDeleteModalVisible = false;
+    private int ownerToDelete;
+    private string ownerToDeleteName;
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,16 +125,32 @@ else
         Navigation.NavigateTo($"/edit-owner-profile/{ownerId}");
     }
 
-    private async Task DeleteOwnerProfile(int ownerId)
+    private void ShowDeleteModal(int ownerId, string ownerName)
+    {
+        ownerToDelete = ownerId;
+        ownerToDeleteName = ownerName;
+        isDeleteModalVisible = true;
+    }
+
+    private void CancelDelete()
+    {
+        isDeleteModalVisible = false;
+    }
+
+    private async Task ConfirmDelete()
     {
         try
         {
-            await OwnerRepository.DeleteOwnerProfileAsync(ownerId);
+            await OwnerRepository.DeleteOwnerProfileAsync(ownerToDelete);
             Owners = (await OwnerRepository.GetAllOwnerProfilesAsync()).ToList(); // Refresh list
         }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error deleting owner profile: {ex.Message}");
+        }
+        finally
+        {
+            isDeleteModalVisible = false;
         }
     }
 }
