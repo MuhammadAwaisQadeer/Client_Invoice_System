@@ -49,3 +49,26 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+
+.breadcrumb-item a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    padding: 0 10px;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.breadcrumb-item.active {
+    font-weight: bold;
+    color: #343a40;
+}
+

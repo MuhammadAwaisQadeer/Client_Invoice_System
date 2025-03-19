@@ -5,6 +5,10 @@
 @using Client_Invoice_System.Repository
 @inject EmployeeRepository EmployeeRepository
 @inject NavigationManager Navigation
+@using Client_Invoice_System.Components.Shared
+
+@* <Breadcrumb /> *@
+
 
 <h3 class="text-primary text-center">@(EmployeeId == null ? "Add Employee" : "Edit Employee")</h3>
 

@@ -4,9 +4,12 @@
 @using Client_Invoice_System.Repositories
 @using Client_Invoice_System.Repository
 @inject ActiveClientRepository ActiveClientRepository
+@using Client_Invoice_System.Components.Shared
+
+<Breadcrumb />
+
 
 <h3>Active Clients</h3>
-
 @if (activeClients != null)
 {
     <table class="table">

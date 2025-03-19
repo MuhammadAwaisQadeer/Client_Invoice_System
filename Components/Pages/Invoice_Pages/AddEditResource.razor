@@ -6,8 +6,10 @@
 @inject ResourceRepository ResourceRepository
 @inject EmployeeRepository EmployeeRepository
 @inject ClientRepository ClientRepository
+@using Client_Invoice_System.Components.Shared
+@* <Breadcrumb /> *@
 
-<h3 class="text-primary text-center">@(ResourceId == null ? "Add Resource" : "Edit Resource")</h3>
+<h3 class="text-primary text-center">@(ResourceId == null ? "Add Contracts" : "Edit Contracts")</h3>
 
 <EditForm Model="EditingResource" OnValidSubmit="SaveResource">
     <DataAnnotationsValidator />

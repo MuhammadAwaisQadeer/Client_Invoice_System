@@ -21,6 +21,9 @@ namespace Client_Invoice_System.Models
         //public DateTime DueDate { get; set; }
         public bool IsActive { get; set; } = true;
 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
+
+        public DateTime? UpdatedAt { get; set; } // Nullable, only updates when modified
         // Navigation Properties
         public virtual Client Client { get; set; }
         public virtual Employee Employee { get; set; }

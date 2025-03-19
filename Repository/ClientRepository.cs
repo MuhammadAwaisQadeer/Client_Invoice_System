@@ -2,6 +2,7 @@
 using Client_Invoice_System.Models;
 using Client_Invoice_System.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ namespace Client_Invoice_System.Repository
     {
         public ClientRepository(ApplicationDbContext context) : base(context) { }
 
-
         public async Task<List<Client>> GetAllClientsWithDetailsAsync()
         {
             return await _context.Clients.Include(c => c.CountryCurrency).AsNoTracking().ToListAsync();
@@ -22,6 +22,33 @@ namespace Client_Invoice_System.Repository
         {
             return await _context.Clients.CountAsync();
         }
+
+        public async Task<int> GetTotalEmployeesAsync()
+        {
+            try
+            {
+                return await _context.Employees.CountAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching total employees: {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<int> GetActiveContractsCountAsync()
+        {
+            try
+            {
+                return await _context.Resources.CountAsync(c => c.IsActive);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching active contracts count: {ex.Message}");
+                return 0;
+            }
+        }
+
         public async Task<bool> EmailExistsAsync(string email)
         {
             try
@@ -31,7 +58,7 @@ namespace Client_Invoice_System.Repository
             catch (Exception ex)
             {
                 Console.WriteLine($"Error checking email existence: {ex.Message}");
-                return false; // Default to false on failure
+                return false;
             }
         }
 
@@ -46,7 +73,7 @@ namespace Client_Invoice_System.Repository
             catch (Exception ex)
             {
                 Console.WriteLine($"Error retrieving client with resources: {ex.Message}");
-                return null; // Return null on failure
+                return null;
             }
         }
 
@@ -61,8 +88,6 @@ namespace Client_Invoice_System.Repository
                     return;
                 }
 
-
-
                 _dbSet.Remove(client);
                 await _context.SaveChangesAsync();
             }
@@ -71,7 +96,6 @@ namespace Client_Invoice_System.Repository
                 Console.WriteLine($"Error deleting client: {ex.Message}");
             }
         }
-
 
         public async Task<Client> GetByIdAsync(int clientId)
         {
@@ -82,7 +106,7 @@ namespace Client_Invoice_System.Repository
             catch (Exception ex)
             {
                 Console.WriteLine($"Error retrieving client by ID: {ex.Message}");
-                return null; // Return null on failure
+                return null;
             }
         }
 
@@ -111,6 +135,5 @@ namespace Client_Invoice_System.Repository
                 Console.WriteLine($"Error updating client: {ex.Message}");
             }
         }
-
     }
 }

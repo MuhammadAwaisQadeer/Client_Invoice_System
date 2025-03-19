@@ -28,7 +28,9 @@ namespace Client_Invoice_System.Models
         public DateTime DueDate { get; set; } = DateTime.Now;
         [Required]
         public string ClientIdentifier { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
 
+        public DateTime? UpdatedAt { get; set; }
         // Navigation properties...
         public virtual ActiveClient ActiveClient { get; set; }
         public virtual ICollection<Resource> Resources { get; set; }

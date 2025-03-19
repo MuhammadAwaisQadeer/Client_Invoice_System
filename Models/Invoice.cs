@@ -23,6 +23,9 @@ namespace Client_Invoice_System.Models
 
         [ForeignKey("CountryCurrencyId")]
         public virtual CountryCurrency CountryCurrency { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
+
+        public DateTime? UpdatedAt { get; set; } // Nullable, only updates when modified
 
         public string EmailStatus { get; set; } = "Not Sent";
         public bool IsPaid { get; set; } = false; // Payment status

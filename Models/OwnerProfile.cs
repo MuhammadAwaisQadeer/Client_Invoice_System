@@ -36,5 +36,8 @@ namespace Client_Invoice_System.Models
 
         public string AccountTitle { get; set; }
         public string AccountNumber { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
+
+        public DateTime? UpdatedAt { get; set; } // Nullable, only updates when modified
     }
 }

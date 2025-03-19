@@ -6,6 +6,8 @@
 @inject ResourceRepository ResourceRepository
 @inject EmployeeRepository EmployeeRepository
 @inject ClientRepository ClientRepository
+@using Client_Invoice_System.Components.Shared
+<Breadcrumb />
 
 <h3>Manage Contracts (@(ResourcesList?.Count ?? 0))</h3>
 <div class="d-flex justify-content-end">
