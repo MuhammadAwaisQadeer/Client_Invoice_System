@@ -378,6 +378,9 @@ namespace Client_Invoice_System.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsInvoiced")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ResourceName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

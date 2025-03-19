@@ -37,8 +37,17 @@ namespace Client_Invoice_System.Repository
         // ✅ Add a New Owner Profile
         public async Task AddOwnerProfileAsync(OwnerProfile owner)
         {
-            await _dbSet.AddAsync(owner);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _dbSet.AddAsync(owner);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+           
         }
 
         // ✅ Update Owner Profile

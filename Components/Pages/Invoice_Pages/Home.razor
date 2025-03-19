@@ -143,7 +143,7 @@
             int totalEmployees = 0;
             int activeContracts = 0;
 
-            // If any filter is applied, set employees to 0
+            // Check if a client filter is applied
             bool isFilterApplied = SelectedClientId.HasValue || SelectedDate.HasValue || SelectedMonth.HasValue;
             if (isFilterApplied)
             {
@@ -152,6 +152,10 @@
                 {
                     var client = await ClientRepo.GetClientWithResourcesAsync(SelectedClientId.Value);
                     activeContracts = client?.Resources?.Count(r => r.IsActive) ?? 0;
+
+                    // ✅ Fetch employees linked to this client
+                    var employees = await ClientRepo.GetEmployeesByClientIdAsync(SelectedClientId.Value);
+                    totalEmployees = employees.Count;
                 }
             }
             else
@@ -169,6 +173,7 @@
             Console.WriteLine($"❌ Error fetching dashboard data: {ex.Message}");
         }
     }
+
 
     private void UpdateDashboardCards(decimal totalRevenue, decimal unpaidInvoices, int totalEmployees, int activeContracts)
     {

@@ -13,66 +13,66 @@
 
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-lg p-4 rounded" style="width: 450px;">
-<h3 class="text-center text-primary mb-4">@(ClientId == 0 ? "Add Client" : "Edit Client")</h3>
-<EditForm Model="client" OnValidSubmit="SaveClient">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <h3 class="text-center text-primary mb-4">@(ClientId == 0 ? "Add Client" : "Edit Client")</h3>
+        <EditForm Model="client" OnValidSubmit="SaveClient">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-    <div class="card shadow p-4">
-        <div class="mb-3">
-            <label class="form-label">Name:</label>
-            <InputText class="form-control" @bind-Value="client.Name" />
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label">Email:</label>
-            <InputText class="form-control" type="email" @bind-Value="client.Email" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Name:</label>
+                <InputText class="form-control" @bind-Value="client.Name" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Address:</label>
-            <InputText class="form-control" @bind-Value="client.Address" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <InputText class="form-control" type="email" @bind-Value="client.Email" />
+            </div>
 
-        <div class="mb-3">
-            <label class="form-label">Phone Number:</label>
-            <InputText class="form-control" @bind-Value="client.PhoneNumber" />
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Address:</label>
+                <InputText class="form-control" @bind-Value="client.Address" />
+            </div>
 
-        <!-- Country Selection -->
-        <div class="mb-3">
-            <label class="form-label">Country</label>
-            <select class="form-control" @onchange="OnCountryChange">
-                <option value="">Select Country</option>
-                @foreach (var item in CountryCurrencyList)
-                {
-                    <option value="@item.Id" selected="@(item.Id == client.CountryCurrencyId)"> @($"{item.CountryName} ({item.CurrencyCode} - {item.Symbol})") </option>
-                }
-            </select>
-        </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number:</label>
+                <InputText class="form-control" @bind-Value="client.PhoneNumber" />
+            </div>
 
-        <!-- Auto-selected Currency -->
-        <div class="mb-3">
-            <label class="form-label">Currency</label>
-            <input type="text" class="form-control" value="@SelectedCurrency" readonly />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Custom Currency (Optional)</label>
-            <input type="text" class="form-control" @bind="client.CustomCurrency" placeholder="Override Default Currency" />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Client Identifier:</label>
-            <InputText class="form-control" @bind-Value="client.ClientIdentifier" maxlength="3" />
-        </div>
+            <!-- Country Selection -->
+            <div class="mb-3">
+                <label class="form-label">Country</label>
+                <select class="form-control" @onchange="OnCountryChange">
+                    <option value="">Select Country</option>
+                    @foreach (var item in CountryCurrencyList)
+                    {
+                        <option value="@item.Id" selected="@(item.Id == client.CountryCurrencyId)"> @($"{item.CountryName} ({item.CurrencyCode} - {item.Symbol})") </option>
+                    }
+                </select>
+            </div>
 
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-primary px-4 py-2">Save</button>
-                    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-                </div>
+            <!-- Auto-selected Currency -->
+            <div class="mb-3">
+                <label class="form-label">Currency</label>
+                <input type="text" class="form-control" value="@SelectedCurrency" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Custom Currency (Optional)</label>
+                <input type="text" class="form-control" @bind="client.CustomCurrency" placeholder="Override Default Currency" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Client Identifier:</label>
+                <InputText class="form-control" @bind-Value="client.ClientIdentifier" maxlength="3" />
+            </div>
 
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-primary px-4 py-2">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+
+
+        </EditForm>
     </div>
-</EditForm>
-</div>
 </div>
 @code {
     [Parameter] public int ClientId { get; set; }

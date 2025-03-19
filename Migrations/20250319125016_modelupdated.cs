@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Client_Invoice_System.Migrations
 {
     /// <inheritdoc />
-    public partial class updatedreview : Migration
+    public partial class modelupdated : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,8 +36,13 @@ namespace Client_Invoice_System.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Designation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Designation = table.Column<int>(type: "int", nullable: false),
+                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreditLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreditUsed = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreditExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,9 +60,11 @@ namespace Client_Invoice_System.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "N/A"),
                     CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
-                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "NEWID()")
+                    ClientIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValueSql: "NEWID()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -77,7 +86,7 @@ namespace Client_Invoice_System.Migrations
                     OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BillingEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
-                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomCurrency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BillingAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -86,7 +95,9 @@ namespace Client_Invoice_System.Migrations
                     BeneficeryAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IBANNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AccountTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,6 +165,8 @@ namespace Client_Invoice_System.Migrations
                     InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CountryCurrencyId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EmailStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -184,7 +197,10 @@ namespace Client_Invoice_System.Migrations
                     ResourceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     ConsumedTotalHours = table.Column<int>(type: "int", nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsInvoiced = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -201,6 +217,20 @@ namespace Client_Invoice_System.Migrations
                         principalTable: "Employees",
                         principalColumn: "EmployeeId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "CountryCurrencies",
+                columns: new[] { "Id", "CountryName", "CurrencyCode", "CurrencyName", "Symbol" },
+                values: new object[,]
+                {
+                    { 1, "United States", "USD", "US Dollar", "$" },
+                    { 2, "United Kingdom", "GBP", "Pound Sterling", "£" },
+                    { 3, "European Union", "EUR", "Euro", "€" },
+                    { 4, "Japan", "JPY", "Japanese Yen", "¥" },
+                    { 5, "India", "INR", "Indian Rupee", "₹" },
+                    { 6, "Canada", "CAD", "Canadian Dollar", "C$" },
+                    { 7, "Australia", "AUD", "Australian Dollar", "A$" }
                 });
 
             migrationBuilder.CreateIndex(

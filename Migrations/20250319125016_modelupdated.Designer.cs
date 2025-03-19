@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Client_Invoice_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250314142502_updatedreview")]
-    partial class updatedreview
+    [Migration("20250319125016_modelupdated")]
+    partial class modelupdated
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,8 +68,10 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("CountryCurrencyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomCurrency")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DueDate")
@@ -88,6 +90,9 @@ namespace Client_Invoice_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("N/A");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ClientId");
 
@@ -142,6 +147,64 @@ namespace Client_Invoice_System.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CountryCurrencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CountryName = "United States",
+                            CurrencyCode = "USD",
+                            CurrencyName = "US Dollar",
+                            Symbol = "$"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CountryName = "United Kingdom",
+                            CurrencyCode = "GBP",
+                            CurrencyName = "Pound Sterling",
+                            Symbol = "£"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CountryName = "European Union",
+                            CurrencyCode = "EUR",
+                            CurrencyName = "Euro",
+                            Symbol = "€"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CountryName = "Japan",
+                            CurrencyCode = "JPY",
+                            CurrencyName = "Japanese Yen",
+                            Symbol = "¥"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CountryName = "India",
+                            CurrencyCode = "INR",
+                            CurrencyName = "Indian Rupee",
+                            Symbol = "₹"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CountryName = "Canada",
+                            CurrencyCode = "CAD",
+                            CurrencyName = "Canadian Dollar",
+                            Symbol = "C$"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CountryName = "Australia",
+                            CurrencyCode = "AUD",
+                            CurrencyName = "Australian Dollar",
+                            Symbol = "A$"
+                        });
                 });
 
             modelBuilder.Entity("Client_Invoice_System.Models.Employee", b =>
@@ -152,9 +215,20 @@ namespace Client_Invoice_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
 
-                    b.Property<string>("Designation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreditExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("CreditLimit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CreditUsed")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Designation")
+                        .HasColumnType("int");
 
                     b.Property<string>("EmployeeName")
                         .IsRequired()
@@ -162,6 +236,9 @@ namespace Client_Invoice_System.Migrations
 
                     b.Property<decimal>("HourlyRate")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("EmployeeId");
 
@@ -182,6 +259,9 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("CountryCurrencyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EmailStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -194,6 +274,9 @@ namespace Client_Invoice_System.Migrations
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("InvoiceId");
 
@@ -243,8 +326,10 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("CountryCurrencyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomCurrency")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IBANNumber")
@@ -262,6 +347,9 @@ namespace Client_Invoice_System.Migrations
                     b.Property<string>("Swiftcode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -284,15 +372,24 @@ namespace Client_Invoice_System.Migrations
                     b.Property<int>("ConsumedTotalHours")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DueDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsInvoiced")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ResourceName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ResourceId");
 

@@ -76,6 +76,22 @@ namespace Client_Invoice_System.Repository
                 return null;
             }
         }
+        public async Task<List<Employee>> GetEmployeesByClientIdAsync(int clientId)
+        {
+            try
+            {
+                return await _context.Resources
+                    .Where(r => r.ClientId == clientId)
+                    .Select(r => r.Employee)  // Get associated employees
+                    .Distinct()
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching employees for client {clientId}: {ex.Message}");
+                return new List<Employee>();
+            }
+        }
 
         public override async Task DeleteAsync(int clientId)
         {
