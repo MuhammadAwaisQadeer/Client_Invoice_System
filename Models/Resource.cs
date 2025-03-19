@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Client_Invoice_System.Models
 {
@@ -18,15 +19,18 @@ namespace Client_Invoice_System.Models
         public int EmployeeId { get; set; }
 
         public int ConsumedTotalHours { get; set; }
-        //public DateTime DueDate { get; set; }
+
         public bool IsActive { get; set; } = true;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
+        // New property: tracks if this resource has already been invoiced.
+        public bool IsInvoiced { get; set; }
 
-        public DateTime? UpdatedAt { get; set; } // Nullable, only updates when modified
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? UpdatedAt { get; set; }
+
         // Navigation Properties
         public virtual Client Client { get; set; }
         public virtual Employee Employee { get; set; }
     }
-
 }

@@ -6,14 +6,15 @@
 @using Client_Invoice_System.Components.Shared
 @inject InvoiceService InvoiceService
 @inject ClientRepository ClientRepo
-
-
 @inject IJSRuntime JS
-<div><Breadcrumb /></div>
+
+<div>
+    <Breadcrumb />
+</div>
 <h3>Invoice Management</h3>
 
-<div class="d-flex align-items-center gap-2" style="width: 100%;">
-    <select class="form-control w-25" @bind="SelectedClientId" placehoder="Select Client">
+<div class="d-flex align-items-center gap-2 mb-3">
+    <select class="form-control w-25" @bind="SelectedClientId">
         <option value="">-- Select Client --</option>
         @foreach (var client in Clients)
         {
@@ -22,7 +23,6 @@
             </option>
         }
     </select>
-
     <button class="btn btn-primary" @onclick="GenerateInvoice">Generate Invoice</button>
 </div>
 
@@ -65,9 +65,8 @@
                     <td>
                         <button class="btn btn-sm btn-primary" @onclick="() => DownloadInvoice(invoice.ClientId)">Download</button>
                         <button class="btn btn-sm btn-success" @onclick="() => ShowSendEmailModal(invoice.ClientId, invoice.Client?.Name)">Send Email</button>
-                        <button class="btn btn-sm btn-warning" @onclick="() => ShowMarkAsPaidModal(invoice.InvoiceId, invoice.Client?.Name)" disabled="@invoice.IsPaid">
-                            Mark as Paid
-                        </button>
+                        <button class="btn btn-sm btn-warning" @onclick="() => ShowMarkAsPaidModal(invoice.InvoiceId, invoice.Client?.Name)" disabled="@invoice.IsPaid">Mark as Paid</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => ShowDeleteInvoiceModal(invoice.InvoiceId, invoice.Client?.Name)">Delete</button>
                     </td>
                 </tr>
             }
@@ -109,6 +108,20 @@
     </div>
 }
 
+<!-- Delete Invoice Confirmation Modal -->
+@if (isDeleteInvoiceModalVisible)
+{
+    <div class="modal-overlay">
+        <div class="delete-modal">
+            <p class="fw-bold">Are you sure you want to delete the invoice for <span class="text-danger">@modalClientName</span>?</p>
+            <div class="d-flex justify-content-center gap-3">
+                <button class="btn btn-danger" @onclick="ConfirmDeleteInvoice">Yes, Delete</button>
+                <button class="btn btn-secondary" @onclick="CancelDeleteInvoice">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
 <style>
     .modal-overlay {
         position: fixed;
@@ -122,7 +135,6 @@
         background: rgba(0, 0, 0, 0.4);
         z-index: 1050;
     }
-
     .delete-modal {
         background: white;
         padding: 20px;
@@ -138,8 +150,10 @@
     private List<Invoice> Invoices = new();
     private int SelectedClientId;
 
+    // Modal control fields
     private bool isSendEmailModalVisible = false;
     private bool isMarkAsPaidModalVisible = false;
+    private bool isDeleteInvoiceModalVisible = false;
     private int modalInvoiceId;
     private int modalClientId;
     private string modalClientName;
@@ -156,6 +170,7 @@
             Console.WriteLine($"Error loading invoices: {ex.Message}");
         }
     }
+
     private async Task GenerateInvoice()
     {
         try
@@ -166,9 +181,22 @@
                 return;
             }
 
-            await InvoiceService.SaveInvoiceAsync(SelectedClientId);
-            Console.WriteLine("Invoice saved successfully.");
-
+            // Check if there is an existing unpaid invoice for the client
+            var existingInvoice = await InvoiceService.GetUnpaidInvoiceForClientAsync(SelectedClientId);
+            if (existingInvoice != null)
+            {
+                // Calculate the additional amount based on new resource consumption
+                decimal additionalAmount = await InvoiceService.CalculateAdditionalAmountAsync(SelectedClientId);
+                existingInvoice.TotalAmount += additionalAmount;
+                await InvoiceService.UpdateInvoiceAsync(existingInvoice);
+                Console.WriteLine("Existing invoice updated with new resource consumption.");
+            }
+            else
+            {
+                await InvoiceService.CreateInvoiceAsync(SelectedClientId);
+                Console.WriteLine("New invoice generated.");
+            }
+            
             // Refresh the invoice list
             Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
         }
@@ -177,6 +205,7 @@
             Console.WriteLine($"Error generating invoice: {ex.Message}");
         }
     }
+
     private async Task DownloadInvoice(int clientId)
     {
         try
@@ -186,7 +215,6 @@
                 Console.WriteLine("Invalid Client ID");
                 return;
             }
-
             byte[] pdfData = await InvoiceService.GenerateInvoicePdfAsync(clientId);
             var fileName = $"Invoice_{clientId}.pdf";
             await JS.InvokeVoidAsync("downloadFileFromStream", fileName, new DotNetStreamReference(new MemoryStream(pdfData)), "application/pdf");
@@ -253,6 +281,35 @@
         finally
         {
             isMarkAsPaidModalVisible = false;
+        }
+    }
+
+    private void ShowDeleteInvoiceModal(int invoiceId, string clientName)
+    {
+        modalInvoiceId = invoiceId;
+        modalClientName = clientName;
+        isDeleteInvoiceModalVisible = true;
+    }
+
+    private void CancelDeleteInvoice()
+    {
+        isDeleteInvoiceModalVisible = false;
+    }
+
+    private async Task ConfirmDeleteInvoice()
+    {
+        try
+        {
+            await InvoiceService.DeleteInvoiceAsync(modalInvoiceId);
+            Invoices = (await InvoiceService.GetAllInvoicesAsync()).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting invoice: {ex.Message}");
+        }
+        finally
+        {
+            isDeleteInvoiceModalVisible = false;
         }
     }
 }

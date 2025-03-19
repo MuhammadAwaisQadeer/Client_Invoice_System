@@ -16,18 +16,17 @@ namespace Client_Invoice_System.Models
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal TotalAmount { get; set; }  
+        public decimal TotalAmount { get; set; }
 
         [Required]
         public int CountryCurrencyId { get; set; }
-
         [ForeignKey("CountryCurrencyId")]
         public virtual CountryCurrency CountryCurrency { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // Set default on creation
 
-        public DateTime? UpdatedAt { get; set; } // Nullable, only updates when modified
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
 
         public string EmailStatus { get; set; } = "Not Sent";
-        public bool IsPaid { get; set; } = false; // Payment status
+        public bool IsPaid { get; set; } = false;
     }
 }
