@@ -4,6 +4,7 @@ using Client_Invoice_System.Repositories;
 using Client_Invoice_System.Repository;
 using Client_Invoice_System.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -22,8 +23,26 @@ builder.Services.AddScoped<ActiveClientRepository>();
 builder.Services.AddScoped<OwnerRepository>();
 builder.Services.AddScoped<CountryCurrencyRepository>();
 
-
-
+//var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"]);
+//builder.Services.AddAuthentication(options =>
+//{
+//    //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    //options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//.AddJwtBearer(options =>
+//{
+//    options.RequireHttpsMetadata = false;
+//    options.SaveToken = true;
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(key),
+//        ValidateIssuer = false,
+//        ValidateAudience = false,
+//        ClockSkew = TimeSpan.Zero
+//    };
+//});
+builder.Services.AddServerSideBlazor();
 
 var app = builder.Build();
 
